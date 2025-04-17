@@ -10,6 +10,7 @@ local HRP = Character:WaitForChild("HumanoidRootPart")
 local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local Camera = workspace.CurrentCamera
 
 -- UI Setup
 local gui = Instance.new("ScreenGui", game.CoreGui)
@@ -37,7 +38,7 @@ wait(1.5)
 introFrame:Destroy()
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 300, 0, 450)
+frame.Size = UDim2.new(0, 300, 0, 600)
 frame.Position = UDim2.new(0, 30, 0.3, 0)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
@@ -45,7 +46,6 @@ frame.BackgroundTransparency = 0
 frame.AnchorPoint = Vector2.new(0, 0.5)
 frame.ClipsDescendants = true
 
--- Bordas arredondadas
 local uicorner = Instance.new("UICorner", frame)
 uicorner.CornerRadius = UDim.new(0, 12)
 
@@ -53,7 +53,6 @@ local layout = Instance.new("UIListLayout", frame)
 layout.Padding = UDim.new(0, 8)
 layout.SortOrder = Enum.SortOrder.LayoutOrder
 
--- Título
 local title = Instance.new("TextLabel", frame)
 title.Text = "🌟 Lucas Menu"
 title.Size = UDim2.new(1, 0, 0, 50)
@@ -62,7 +61,6 @@ title.Font = Enum.Font.GothamBold
 title.TextSize = 24
 title.BackgroundTransparency = 1
 
--- Função para criar botões
 local function createBtn(text, callback)
 	local btn = Instance.new("TextButton", frame)
 	btn.Size = UDim2.new(1, -20, 0, 40)
@@ -81,15 +79,13 @@ local function createBtn(text, callback)
 	return btn
 end
 
--- WalkSpeed
 createBtn("🏃 WalkSpeed (Set)", function()
 	local val = tonumber(string.match(tostring(game:GetService("StarterGui"):PromptInput("WalkSpeed (0-100):")), "%d+")) or 16
 	Humanoid.WalkSpeed = math.clamp(val, 0, 100)
 end)
 
--- Fly
 local flying = false
-createBtn("🗳️ Fly (Toggle)", function()
+createBtn("🕊️ Fly (Toggle)", function()
 	flying = not flying
 	local bv = Instance.new("BodyVelocity")
 	local bg = Instance.new("BodyGyro")
@@ -121,7 +117,6 @@ createBtn("🗳️ Fly (Toggle)", function()
 	end)
 end)
 
--- Noclip
 local noclip = false
 createBtn("🚪 Noclip (Toggle)", function()
 	noclip = not noclip
@@ -136,8 +131,7 @@ createBtn("🚪 Noclip (Toggle)", function()
 	end)
 end)
 
--- Teleportar para jogador
-createBtn("🧙 Teleportar para Jogador", function()
+createBtn("🧍 Teleportar para Jogador", function()
 	local name = game:GetService("StarterGui"):PromptInput("Nome do jogador:")
 	local p = Players:FindFirstChild(name)
 	if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
@@ -145,7 +139,6 @@ createBtn("🧙 Teleportar para Jogador", function()
 	end
 end)
 
--- Fling Player
 createBtn("🌀 Fling Jogador", function()
 	local name = game:GetService("StarterGui"):PromptInput("Nome do jogador para fling:")
 	local p = Players:FindFirstChild(name)
@@ -159,7 +152,62 @@ createBtn("🌀 Fling Jogador", function()
 	end
 end)
 
--- Anti-Bot
+createBtn("🎯 Aimbot (Toggle)", function()
+	local enabled = true
+	RS.RenderStepped:Connect(function()
+		if not enabled then return end
+		local closest
+		local shortest = math.huge
+		for _, p in pairs(Players:GetPlayers()) do
+			if p ~= LP and p.Character and p.Character:FindFirstChild("Head") then
+				local pos, onScreen = Camera:WorldToViewportPoint(p.Character.Head.Position)
+				if onScreen then
+					local dist = (Vector2.new(pos.X, pos.Y) - UIS:GetMouseLocation()).Magnitude
+					if dist < shortest then
+						shortest = dist
+						closest = p
+					end
+				end
+			end
+		end
+		if closest then
+			Camera.CFrame = CFrame.new(Camera.CFrame.Position, closest.Character.Head.Position)
+		end
+	end)
+end)
+
+createBtn("🧱 Wallhack", function()
+	for _, p in pairs(Players:GetPlayers()) do
+		if p ~= LP and p.Character then
+			for _, part in pairs(p.Character:GetChildren()) do
+				if part:IsA("BasePart") then
+					local highlight = Instance.new("Highlight")
+					highlight.FillColor = Color3.fromRGB(255, 0, 0)
+					highlight.OutlineColor = Color3.new(1, 1, 1)
+					highlight.Adornee = part
+					highlight.Parent = part
+				end
+		end
+	end
+end)
+
+createBtn("⚡ Teleportar p/ Jogador Mais Próximo", function()
+	local closest
+	local shortest = math.huge
+	for _, p in pairs(Players:GetPlayers()) do
+		if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+			local dist = (HRP.Position - p.Character.HumanoidRootPart.Position).Magnitude
+			if dist < shortest then
+				shortest = dist
+				closest = p
+			end
+		end
+	end
+	if closest then
+		HRP.CFrame = closest.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
+	end
+end)
+
 createBtn("🤖 Anti-Bot", function()
 	for _, p in pairs(Players:GetPlayers()) do
 		if p ~= LP and #p.Name <= 3 then
