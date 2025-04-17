@@ -1,152 +1,148 @@
--- Fly + WalkSpeed GUI (feito pra KRNL)
+-- Lucas Menu | Cheat GUI bonito e funcional (by ChatGPT)
 
--- Espera o jogo carregar
-if not game:IsLoaded() then
-    game.Loaded:Wait()
-end
+if not game:IsLoaded() then game.Loaded:Wait() end
 
 local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+local Character = LP.Character or LP.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local HRP = Character:WaitForChild("HumanoidRootPart")
 local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local hrp = character:WaitForChild("HumanoidRootPart")
-local humanoid = character:WaitForChild("Humanoid")
 
--- GUI Setup
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-ScreenGui.Name = "CheatGui"
-ScreenGui.ResetOnSpawn = false
+-- UI Setup
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "LucasMenu"
+gui.ResetOnSpawn = false
 
--- Fly Button
-local flyButton = Instance.new("TextButton", ScreenGui)
-flyButton.Size = UDim2.new(0, 100, 0, 40)
-flyButton.Position = UDim2.new(0, 10, 0, 10)
-flyButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-flyButton.TextColor3 = Color3.new(1, 1, 1)
-flyButton.Font = Enum.Font.SourceSansBold
-flyButton.TextSize = 20
-flyButton.Text = "Fly: OFF"
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 300, 0, 450)
+frame.Position = UDim2.new(0, 30, 0.3, 0)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.BackgroundTransparency = 0
+frame.AnchorPoint = Vector2.new(0, 0.5)
+frame.ClipsDescendants = true
 
--- WalkSpeed Frame
-local speedFrame = Instance.new("Frame", ScreenGui)
-speedFrame.Size = UDim2.new(0, 200, 0, 100)
-speedFrame.Position = UDim2.new(0, 10, 0, 60)
-speedFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-speedFrame.BorderSizePixel = 0
+-- Bordas arredondadas
+local uicorner = Instance.new("UICorner", frame)
+uicorner.CornerRadius = UDim.new(0, 12)
 
--- Label
-local speedLabel = Instance.new("TextLabel", speedFrame)
-speedLabel.Size = UDim2.new(1, 0, 0, 30)
-speedLabel.Position = UDim2.new(0, 0, 0, 0)
-speedLabel.BackgroundTransparency = 1
-speedLabel.Text = "WalkSpeed"
-speedLabel.TextColor3 = Color3.new(1, 1, 1)
-speedLabel.Font = Enum.Font.SourceSansBold
-speedLabel.TextSize = 20
+local layout = Instance.new("UIListLayout", frame)
+layout.Padding = UDim.new(0, 8)
+layout.SortOrder = Enum.SortOrder.LayoutOrder
 
--- Slider
-local slider = Instance.new("TextBox", speedFrame)
-slider.Size = UDim2.new(1, -20, 0, 30)
-slider.Position = UDim2.new(0, 10, 0, 35)
-slider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-slider.Text = "16"
-slider.TextColor3 = Color3.new(1, 1, 1)
-slider.Font = Enum.Font.SourceSans
-slider.TextSize = 18
-slider.ClearTextOnFocus = false
+-- Título
+local title = Instance.new("TextLabel", frame)
+title.Text = "🌟 Lucas Menu"
+title.Size = UDim2.new(1, 0, 0, 50)
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 24
+title.BackgroundTransparency = 1
 
--- OK Button
-local applyButton = Instance.new("TextButton", speedFrame)
-applyButton.Size = UDim2.new(1, -20, 0, 30)
-applyButton.Position = UDim2.new(0, 10, 0, 70)
-applyButton.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
-applyButton.TextColor3 = Color3.new(1, 1, 1)
-applyButton.Font = Enum.Font.SourceSansBold
-applyButton.TextSize = 18
-applyButton.Text = "OK"
+-- Função para criar botões
+local function createBtn(text, callback)
+	local btn = Instance.new("TextButton", frame)
+	btn.Size = UDim2.new(1, -20, 0, 40)
+	btn.Position = UDim2.new(0, 10, 0, 0)
+	btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Font = Enum.Font.Gotham
+	btn.TextSize = 18
+	btn.Text = text
+	btn.AutoButtonColor = true
 
--- WALK SPEED FUNÇÃO
-applyButton.MouseButton1Click:Connect(function()
-	local val = tonumber(slider.Text)
-	if val and val >= 0 and val <= 100 then
-		humanoid.WalkSpeed = val
-	else
-		slider.Text = "Valor inválido"
+	local corner = Instance.new("UICorner", btn)
+	corner.CornerRadius = UDim.new(0, 8)
+
+	btn.MouseButton1Click:Connect(callback)
+	return btn
+end
+
+-- WalkSpeed
+createBtn("🏃 WalkSpeed (Set)", function()
+	local val = tonumber(string.match(tostring(game:GetService("StarterGui"):PromptInput("WalkSpeed (0-100):")), "%d+")) or 16
+	Humanoid.WalkSpeed = math.clamp(val, 0, 100)
+end)
+
+-- Fly
+local flying = false
+createBtn("🕊️ Fly (Toggle)", function()
+	flying = not flying
+	local bv = Instance.new("BodyVelocity")
+	local bg = Instance.new("BodyGyro")
+	bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+	bg.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
+	bv.P = 1250
+	bg.P = 3000
+	bv.Parent = HRP
+	bg.Parent = HRP
+
+	local flyConn
+	flyConn = RS.RenderStepped:Connect(function()
+		if not flying then
+			bv:Destroy()
+			bg:Destroy()
+			flyConn:Disconnect()
+			return
+		end
+		local cam = workspace.CurrentCamera.CFrame
+		local dir = Vector3.zero
+		if UIS:IsKeyDown(Enum.KeyCode.W) then dir += cam.LookVector end
+		if UIS:IsKeyDown(Enum.KeyCode.S) then dir -= cam.LookVector end
+		if UIS:IsKeyDown(Enum.KeyCode.A) then dir -= cam.RightVector end
+		if UIS:IsKeyDown(Enum.KeyCode.D) then dir += cam.RightVector end
+		if UIS:IsKeyDown(Enum.KeyCode.Space) then dir += cam.UpVector end
+		if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then dir -= cam.UpVector end
+		bv.Velocity = dir.Magnitude > 0 and dir.Unit * 50 or Vector3.zero
+		bg.CFrame = cam
+	end)
+end)
+
+-- Noclip
+local noclip = false
+createBtn("🚪 Noclip (Toggle)", function()
+	noclip = not noclip
+	RS.Stepped:Connect(function()
+		if noclip and LP.Character then
+			for _, p in pairs(LP.Character:GetDescendants()) do
+				if p:IsA("BasePart") then
+					p.CanCollide = false
+				end
+			end
+		end
+	end)
+end)
+
+-- Teleportar para jogador
+createBtn("🧍 Teleportar para Jogador", function()
+	local name = game:GetService("StarterGui"):PromptInput("Nome do jogador:")
+	local p = Players:FindFirstChild(name)
+	if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+		HRP.CFrame = p.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
 	end
 end)
 
--- FLY SYSTEM
-local flying = false
-local bv = Instance.new("BodyVelocity")
-local bg = Instance.new("BodyGyro")
-local speed = 50
+-- Fling Player
+createBtn("🌀 Fling Jogador", function()
+	local name = game:GetService("StarterGui"):PromptInput("Nome do jogador para fling:")
+	local p = Players:FindFirstChild(name)
+	if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+		local fling = Instance.new("BodyThrust")
+		fling.Force = Vector3.new(99999, 99999, 99999)
+		fling.Location = p.Character.HumanoidRootPart.Position
+		fling.Parent = p.Character.HumanoidRootPart
+		wait(0.3)
+		fling:Destroy()
+	end
+end)
 
-bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
-bv.Velocity = Vector3.zero
-bv.P = 1250
-
-bg.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
-bg.P = 3000
-bg.CFrame = hrp.CFrame
-
-local function FlyLoop()
-	RS.RenderStepped:Connect(function()
-		if flying then
-			local camCF = workspace.CurrentCamera.CFrame
-			local moveDir = Vector3.zero
-
-			if UIS:IsKeyDown(Enum.KeyCode.W) then
-				moveDir += camCF.LookVector
-			end
-			if UIS:IsKeyDown(Enum.KeyCode.S) then
-				moveDir -= camCF.LookVector
-			end
-			if UIS:IsKeyDown(Enum.KeyCode.A) then
-				moveDir -= camCF.RightVector
-			end
-			if UIS:IsKeyDown(Enum.KeyCode.D) then
-				moveDir += camCF.RightVector
-			end
-			if UIS:IsKeyDown(Enum.KeyCode.Space) then
-				moveDir += camCF.UpVector
-			end
-			if UIS:IsKeyDown(Enum.KeyCode.LeftControl) then
-				moveDir -= camCF.UpVector
-			end
-
-			if moveDir.Magnitude > 0 then
-				bv.Velocity = moveDir.Unit * speed
-			else
-				bv.Velocity = Vector3.zero
-			end
-
-			bv.Parent = hrp
-			bg.CFrame = camCF
-			bg.Parent = hrp
+-- Anti-Bot
+createBtn("🤖 Anti-Bot", function()
+	for _, p in pairs(Players:GetPlayers()) do
+		if p ~= LP and #p.Name <= 3 then
+			p:Kick("Bot detectado pelo Lucas Menu.")
 		end
-	end)
-end
-
-FlyLoop()
-
-flyButton.MouseButton1Click:Connect(function()
-	flying = not flying
-	if flying then
-		flyButton.Text = "Fly: ON"
-		bv.Parent = hrp
-		bg.Parent = hrp
-	else
-		flyButton.Text = "Fly: OFF"
-		bv:Destroy()
-		bg:Destroy()
-		bv = Instance.new("BodyVelocity")
-		bg = Instance.new("BodyGyro")
-		bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
-		bv.Velocity = Vector3.zero
-		bv.P = 1250
-		bg.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
-		bg.P = 3000
-		bg.CFrame = hrp.CFrame
 	end
 end)
