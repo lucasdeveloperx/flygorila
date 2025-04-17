@@ -9,11 +9,32 @@ local Humanoid = Character:WaitForChild("Humanoid")
 local HRP = Character:WaitForChild("HumanoidRootPart")
 local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
 -- UI Setup
 local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "LucasMenu"
 gui.ResetOnSpawn = false
+
+-- Intro animation
+local introFrame = Instance.new("Frame", gui)
+introFrame.Size = UDim2.new(0, 0, 0, 0)
+introFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+introFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+introFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+introFrame.BackgroundTransparency = 1
+
+local introText = Instance.new("TextLabel", introFrame)
+introText.Size = UDim2.new(1, 0, 1, 0)
+introText.Text = "🌟 Lucas Menu"
+introText.TextColor3 = Color3.new(1, 1, 1)
+introText.Font = Enum.Font.GothamBold
+introText.TextSize = 24
+introText.BackgroundTransparency = 1
+
+TweenService:Create(introFrame, TweenInfo.new(1, Enum.EasingStyle.Bounce), {Size = UDim2.new(0, 300, 0, 450)}):Play()
+wait(1.5)
+introFrame:Destroy()
 
 local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0, 300, 0, 450)
@@ -68,7 +89,7 @@ end)
 
 -- Fly
 local flying = false
-createBtn("🕊️ Fly (Toggle)", function()
+createBtn("🗳️ Fly (Toggle)", function()
 	flying = not flying
 	local bv = Instance.new("BodyVelocity")
 	local bg = Instance.new("BodyGyro")
@@ -116,7 +137,7 @@ createBtn("🚪 Noclip (Toggle)", function()
 end)
 
 -- Teleportar para jogador
-createBtn("🧍 Teleportar para Jogador", function()
+createBtn("🧙 Teleportar para Jogador", function()
 	local name = game:GetService("StarterGui"):PromptInput("Nome do jogador:")
 	local p = Players:FindFirstChild(name)
 	if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
