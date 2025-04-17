@@ -38,7 +38,7 @@ wait(1.5)
 introFrame:Destroy()
 
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 300, 0, 600)
+frame.Size = UDim2.new(0, 300, 0, 660)
 frame.Position = UDim2.new(0, 30, 0.3, 0)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
@@ -79,6 +79,7 @@ local function createBtn(text, callback)
 	return btn
 end
 
+-- Todos os botões do menu
 createBtn("🏃 WalkSpeed (Set)", function()
 	local val = tonumber(string.match(tostring(game:GetService("StarterGui"):PromptInput("WalkSpeed (0-100):")), "%d+")) or 16
 	Humanoid.WalkSpeed = math.clamp(val, 0, 100)
@@ -131,7 +132,7 @@ createBtn("🚪 Noclip (Toggle)", function()
 	end)
 end)
 
-createBtn("🧍 Teleportar para Jogador", function()
+createBtn("🧝 Teleportar para Jogador", function()
 	local name = game:GetService("StarterGui"):PromptInput("Nome do jogador:")
 	local p = Players:FindFirstChild(name)
 	if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
@@ -187,6 +188,7 @@ createBtn("🧱 Wallhack", function()
 					highlight.Adornee = part
 					highlight.Parent = part
 				end
+			end
 		end
 	end
 end)
@@ -214,4 +216,8 @@ createBtn("🤖 Anti-Bot", function()
 			p:Kick("Bot detectado pelo Lucas Menu.")
 		end
 	end
+end)
+
+createBtn("❌ Fechar Script", function()
+	gui:Destroy()
 end)
