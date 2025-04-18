@@ -1,4 +1,4 @@
--- Lucas Menu | Cheat GUI bonito e funcional (by ChatGPT)
+-- Lucas Menu | Cheat GUI Avançado
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 
@@ -54,7 +54,7 @@ introFrame:Destroy()
 
 -- Frame principal
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 300, 0, 700) -- Aumentado para caber o novo toggle
+frame.Size = UDim2.new(0, 300, 0, 700)
 frame.Position = UDim2.new(0, 30, 0.3, 0)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
@@ -94,50 +94,62 @@ local function createToggle(text, stateTableKey, callback)
     end)
 end
 
--- Sistema de Fling automático
+-- Sistema de Fling automático corrigido
 local function setupFling()
     local function flingPlayer(hit)
+        if not hacks.Fling then return end
+        
         local character = hit.Parent
-        if character:FindFirstChildOfClass("Humanoid") then
-            local player = Players:GetPlayerFromCharacter(character)
-            if player and player ~= LP then
-                local rootPart = character:FindFirstChild("HumanoidRootPart")
-                if rootPart then
-                    local fling = Instance.new("BodyVelocity")
-                    fling.Velocity = Vector3.new(math.random(-5000, 5000), math.random(5000, 10000), math.random(-5000, 5000))
-                    fling.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                    fling.P = math.huge
-                    fling.Parent = rootPart
-                    
-                    game:GetService("Debris"):AddItem(fling, 0.5)
-                end
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        if not humanoid then return end
+        
+        local player = Players:GetPlayerFromCharacter(character)
+        if player and player ~= LP then
+            local rootPart = character:FindFirstChild("HumanoidRootPart")
+            if rootPart then
+                -- Cria uma explosão para lançar o jogador
+                local explosion = Instance.new("Explosion")
+                explosion.Position = rootPart.Position
+                explosion.BlastPressure = 50000
+                explosion.BlastRadius = 15
+                explosion.DestroyJointRadiusPercent = 0
+                explosion.ExplosionType = Enum.ExplosionType.NoCraters
+                explosion.Parent = workspace
+                
+                -- Adiciona força adicional para lançar mais longe
+                local bodyVelocity = Instance.new("BodyVelocity")
+                bodyVelocity.Velocity = Vector3.new(
+                    math.random(-2000, 2000),
+                    math.random(3000, 5000),
+                    math.random(-2000, 2000)
+                )
+                bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                bodyVelocity.P = 10000
+                bodyVelocity.Parent = rootPart
+                
+                game:GetService("Debris"):AddItem(explosion, 0.1)
+                game:GetService("Debris"):AddItem(bodyVelocity, 0.2)
             end
         end
     end
 
     -- Conectar ao evento de toque
-    for _, part in ipairs(Character:GetDescendants()) do
-        if part:IsA("BasePart") then
-            part.Touched:Connect(function(hit)
-                if hacks.Fling then
-                    flingPlayer(hit)
-                end
-            end)
+    local function connectTouched()
+        for _, part in ipairs(Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.Touched:Connect(flingPlayer)
+            end
         end
     end
 
+    connectTouched()
+
     -- Reconectar se o personagem mudar
-    LP.CharacterAdded:Connect(function()
-        Character = LP.Character or LP.CharacterAdded:Wait()
-        for _, part in ipairs(Character:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.Touched:Connect(function(hit)
-                    if hacks.Fling then
-                        flingPlayer(hit)
-                    end
-                end)
-            end
-        end
+    LP.CharacterAdded:Connect(function(newChar)
+        Character = newChar
+        Humanoid = Character:WaitForChild("Humanoid")
+        HRP = Character:WaitForChild("HumanoidRootPart")
+        connectTouched()
     end)
 end
 
@@ -159,7 +171,6 @@ walkSpeedPopup.Visible = false
 walkSpeedPopup.ZIndex = 2
 Instance.new("UICorner", walkSpeedPopup).CornerRadius = UDim.new(0, 12)
 
--- Efeito de borda neón
 local neonBorder = Instance.new("UIStroke", walkSpeedPopup)
 neonBorder.Color = Color3.fromRGB(0, 255, 255)
 neonBorder.Thickness = 2
@@ -185,7 +196,6 @@ closeBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 closeBtn.ZIndex = 3
 Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
 
--- Track do slider com efeito neón
 local sliderTrack = Instance.new("Frame", walkSpeedPopup)
 sliderTrack.Size = UDim2.new(0.8, 0, 0, 10)
 sliderTrack.Position = UDim2.new(0.1, 0, 0.4, 0)
@@ -197,14 +207,12 @@ local sliderTrackNeon = Instance.new("UIStroke", sliderTrack)
 sliderTrackNeon.Color = Color3.fromRGB(0, 200, 200)
 sliderTrackNeon.Thickness = 2
 
--- Fill do slider com efeito de gradiente
 local sliderFill = Instance.new("Frame", sliderTrack)
 sliderFill.Size = UDim2.new(0.5, 0, 1, 0)
 sliderFill.BackgroundColor3 = Color3.fromRGB(0, 170, 127)
 sliderFill.BorderSizePixel = 0
 Instance.new("UICorner", sliderFill).CornerRadius = UDim.new(1, 0)
 
--- Botão do slider com efeito neón
 local sliderBtn = Instance.new("TextButton", sliderTrack)
 sliderBtn.Size = UDim2.new(0, 20, 0, 20)
 sliderBtn.Position = UDim2.new(0.5, -10, 0.5, -10)
@@ -236,12 +244,10 @@ applyBtn.TextColor3 = Color3.new(1, 1, 1)
 applyBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 127)
 Instance.new("UICorner", applyBtn).CornerRadius = UDim.new(0, 6)
 
--- Efeito neón para o botão aplicar
 local applyBtnNeon = Instance.new("UIStroke", applyBtn)
 applyBtnNeon.Color = Color3.fromRGB(0, 255, 255)
 applyBtnNeon.Thickness = 2
 
--- Funções do slider WalkSpeed
 local function updateSlider(value)
     value = math.clamp(value, 0, 100)
     local percent = value / 100
@@ -290,7 +296,7 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- Popup de seleção de jogadores com efeito neón
+-- Popup de seleção de jogadores
 local teleportPopup = Instance.new("Frame", gui)
 teleportPopup.Size = UDim2.new(0, 250, 0, 300)
 teleportPopup.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -301,7 +307,6 @@ teleportPopup.Visible = false
 teleportPopup.ZIndex = 2
 Instance.new("UICorner", teleportPopup).CornerRadius = UDim.new(0, 12)
 
--- Efeito de borda neón
 local teleportNeonBorder = Instance.new("UIStroke", teleportPopup)
 teleportNeonBorder.Color = Color3.fromRGB(255, 0, 255)
 teleportNeonBorder.Thickness = 2
@@ -334,8 +339,8 @@ playersList.BorderSizePixel = 0
 playersList.ScrollBarThickness = 5
 playersList.AutomaticCanvasSize = Enum.AutomaticSize.Y
 
-local layout = Instance.new("UIListLayout", playersList)
-layout.Padding = UDim.new(0, 5)
+local listLayout = Instance.new("UIListLayout", playersList)
+listLayout.Padding = UDim.new(0, 5)
 
 local teleportBtn = Instance.new("TextButton", teleportPopup)
 teleportBtn.Size = UDim2.new(0.6, 0, 0, 40)
@@ -348,7 +353,6 @@ teleportBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 170)
 teleportBtn.Visible = false
 Instance.new("UICorner", teleportBtn).CornerRadius = UDim.new(0, 6)
 
--- Efeito neón para o botão de teleportar
 local teleportBtnNeon = Instance.new("UIStroke", teleportBtn)
 teleportBtnNeon.Color = Color3.fromRGB(255, 0, 255)
 teleportBtnNeon.Thickness = 2
@@ -366,15 +370,18 @@ local function updatePlayersList()
         if player ~= LP then
             local playerBtn = Instance.new("TextButton", playersList)
             playerBtn.Size = UDim2.new(1, 0, 0, 40)
-            playerBtn.Text = player.Name
+            playerBtn.Text = "  " .. player.Name .. "  "  -- Espaços para visibilidade
             playerBtn.Font = Enum.Font.Gotham
             playerBtn.TextSize = 16
             playerBtn.TextColor3 = Color3.new(1, 1, 1)
             playerBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
             playerBtn.AutoButtonColor = true
+            playerBtn.TextXAlignment = Enum.TextXAlignment.Left
             Instance.new("UICorner", playerBtn).CornerRadius = UDim.new(0, 6)
             
-            -- Efeito hover nos botões
+            local padding = Instance.new("UIPadding", playerBtn)
+            padding.PaddingLeft = UDim.new(0, 10)
+            
             playerBtn.MouseEnter:Connect(function()
                 if playerBtn ~= selectedPlayer then
                     TS:Create(playerBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(80, 80, 80)}):Play()
@@ -511,7 +518,7 @@ createToggle("🎯 Aimbot", "Aimbot", function(state)
     end
 end)
 
--- Outros comandos diretos (sem toggle)
+-- Outros comandos diretos
 local function createBtn(text, callback)
     local btn = Instance.new("TextButton", frame)
     btn.Size = UDim2.new(1, -20, 0, 40)
@@ -573,6 +580,6 @@ createBtn("❌ Fechar Script", function()
     gui:Destroy()
 end)
 
--- Atualizar lista de jogadores quando alguém entrar/sair
+-- Atualizar lista de jogadores
 Players.PlayerAdded:Connect(updatePlayersList)
 Players.PlayerRemoving:Connect(updatePlayersList)
