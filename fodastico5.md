@@ -20,13 +20,15 @@ gui.ResetOnSpawn = false
 local hacks = {
     Fly = false,
     Noclip = false,
-    Aimbot = false
+    Aimbot = false,
+    Fling = false
 }
 
 local function resetHacks()
     hacks.Fly = false
     hacks.Noclip = false
     hacks.Aimbot = false
+    hacks.Fling = false
     Humanoid.WalkSpeed = 16
 end
 
@@ -52,7 +54,7 @@ introFrame:Destroy()
 
 -- Frame principal
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 300, 0, 660)
+frame.Size = UDim2.new(0, 300, 0, 700) -- Aumentado para caber o novo toggle
 frame.Position = UDim2.new(0, 30, 0.3, 0)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
@@ -91,6 +93,60 @@ local function createToggle(text, stateTableKey, callback)
         callback(hacks[stateTableKey])
     end)
 end
+
+-- Sistema de Fling automático
+local function setupFling()
+    local function flingPlayer(hit)
+        local character = hit.Parent
+        if character:FindFirstChildOfClass("Humanoid") then
+            local player = Players:GetPlayerFromCharacter(character)
+            if player and player ~= LP then
+                local rootPart = character:FindFirstChild("HumanoidRootPart")
+                if rootPart then
+                    local fling = Instance.new("BodyVelocity")
+                    fling.Velocity = Vector3.new(math.random(-5000, 5000), math.random(5000, 10000), math.random(-5000, 5000))
+                    fling.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                    fling.P = math.huge
+                    fling.Parent = rootPart
+                    
+                    game:GetService("Debris"):AddItem(fling, 0.5)
+                end
+            end
+        end
+    end
+
+    -- Conectar ao evento de toque
+    for _, part in ipairs(Character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Touched:Connect(function(hit)
+                if hacks.Fling then
+                    flingPlayer(hit)
+                end
+            end)
+        end
+    end
+
+    -- Reconectar se o personagem mudar
+    LP.CharacterAdded:Connect(function()
+        Character = LP.Character or LP.CharacterAdded:Wait()
+        for _, part in ipairs(Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.Touched:Connect(function(hit)
+                    if hacks.Fling then
+                        flingPlayer(hit)
+                    end
+                end)
+            end
+        end
+    end)
+end
+
+setupFling()
+
+-- Toggle para o Fling automático
+createToggle("🌀 Fling Automático", "Fling", function(state)
+    hacks.Fling = state
+end)
 
 -- Popup do WalkSpeed com efeito neôn
 local walkSpeedPopup = Instance.new("Frame", gui)
@@ -471,19 +527,6 @@ local function createBtn(text, callback)
 end
 
 createBtn("🧝 Teleportar para Jogador", showTeleportPopup)
-
-createBtn("🌀 Fling Jogador", function()
-    local name = game:GetService("StarterGui"):PromptInput("Nome do jogador para fling:")
-    local p = Players:FindFirstChild(name)
-    if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-        local fling = Instance.new("BodyThrust")
-        fling.Force = Vector3.new(99999, 99999, 99999)
-        fling.Location = p.Character.HumanoidRootPart.Position
-        fling.Parent = p.Character.HumanoidRootPart
-        wait(0.3)
-        fling:Destroy()
-    end
-end)
 
 createBtn("🧱 Wallhack", function()
     for _, p in pairs(Players:GetPlayers()) do
