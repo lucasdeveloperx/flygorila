@@ -11,6 +11,7 @@ local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local Camera = workspace.CurrentCamera
+local TS = game:GetService("TweenService")
 
 local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "LucasMenu"
@@ -29,6 +30,7 @@ local function resetHacks()
     Humanoid.WalkSpeed = 16
 end
 
+-- Animação de introdução
 local introFrame = Instance.new("Frame", gui)
 introFrame.Size = UDim2.new(0, 0, 0, 0)
 introFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -48,6 +50,7 @@ TweenService:Create(introFrame, TweenInfo.new(1, Enum.EasingStyle.Bounce), {Size
 wait(1.5)
 introFrame:Destroy()
 
+-- Frame principal
 local frame = Instance.new("Frame", gui)
 frame.Size = UDim2.new(0, 300, 0, 660)
 frame.Position = UDim2.new(0, 30, 0.3, 0)
@@ -57,7 +60,8 @@ frame.AnchorPoint = Vector2.new(0, 0.5)
 frame.ClipsDescendants = true
 
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
-Instance.new("UIListLayout", frame).Padding = UDim.new(0, 8)
+local layout = Instance.new("UIListLayout", frame)
+layout.Padding = UDim.new(0, 8)
 
 local title = Instance.new("TextLabel", frame)
 title.Text = "🌟 Lucas Menu"
@@ -67,6 +71,7 @@ title.Font = Enum.Font.GothamBold
 title.TextSize = 24
 title.BackgroundTransparency = 1
 
+-- Função para criar toggles
 local function createToggle(text, stateTableKey, callback)
     local toggle = Instance.new("TextButton", frame)
     toggle.Size = UDim2.new(1, -20, 0, 40)
@@ -87,7 +92,7 @@ local function createToggle(text, stateTableKey, callback)
     end)
 end
 
--- WalkSpeed com popup
+-- Popup do WalkSpeed
 local walkSpeedPopup = Instance.new("Frame", gui)
 walkSpeedPopup.Size = UDim2.new(0, 250, 0, 180)
 walkSpeedPopup.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -117,21 +122,21 @@ closeBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 closeBtn.ZIndex = 3
 Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
 
-local slider = Instance.new("Frame", walkSpeedPopup)
-slider.Size = UDim2.new(0.8, 0, 0, 20)
-slider.Position = UDim2.new(0.1, 0, 0.4, 0)
-slider.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-Instance.new("UICorner", slider).CornerRadius = UDim.new(1, 0)
+local sliderTrack = Instance.new("Frame", walkSpeedPopup)
+sliderTrack.Size = UDim2.new(0.8, 0, 0, 10)
+sliderTrack.Position = UDim2.new(0.1, 0, 0.4, 0)
+sliderTrack.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+Instance.new("UICorner", sliderTrack).CornerRadius = UDim.new(1, 0)
 
-local sliderFill = Instance.new("Frame", slider)
+local sliderFill = Instance.new("Frame", sliderTrack)
 sliderFill.Size = UDim2.new(0.5, 0, 1, 0)
 sliderFill.BackgroundColor3 = Color3.fromRGB(0, 170, 127)
 sliderFill.BorderSizePixel = 0
 Instance.new("UICorner", sliderFill).CornerRadius = UDim.new(1, 0)
 
-local sliderBtn = Instance.new("TextButton", slider)
+local sliderBtn = Instance.new("TextButton", sliderTrack)
 sliderBtn.Size = UDim2.new(0, 20, 0, 20)
-sliderBtn.Position = UDim2.new(0.5, -10, 0, 0)
+sliderBtn.Position = UDim2.new(0.5, -10, 0.5, -10)
 sliderBtn.BackgroundColor3 = Color3.new(1, 1, 1)
 sliderBtn.Text = ""
 sliderBtn.ZIndex = 2
@@ -140,7 +145,7 @@ Instance.new("UICorner", sliderBtn).CornerRadius = UDim.new(1, 0)
 local valueText = Instance.new("TextLabel", walkSpeedPopup)
 valueText.Size = UDim2.new(1, 0, 0, 30)
 valueText.Position = UDim2.new(0, 0, 0.6, 0)
-valueText.Text = "Valor: "..tostring(Humanoid.WalkSpeed)
+valueText.Text = "Velocidade: "..tostring(Humanoid.WalkSpeed)
 valueText.TextColor3 = Color3.new(1, 1, 1)
 valueText.Font = Enum.Font.Gotham
 valueText.TextSize = 18
@@ -156,12 +161,14 @@ applyBtn.TextColor3 = Color3.new(1, 1, 1)
 applyBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 127)
 Instance.new("UICorner", applyBtn).CornerRadius = UDim.new(0, 6)
 
--- Funções do slider
+-- Funções do slider WalkSpeed
 local function updateSlider(value)
     value = math.clamp(value, 0, 100)
-    sliderFill.Size = UDim2.new(value/100, 0, 1, 0)
-    sliderBtn.Position = UDim2.new(value/100, -10, 0, 0)
-    valueText.Text = "Valor: "..tostring(math.floor(value))
+    local percent = value / 100
+    sliderFill.Size = UDim2.new(percent, 0, 1, 0)
+    sliderBtn.Position = UDim2.new(percent, -10, 0.5, -10)
+    valueText.Text = "Velocidade: "..tostring(math.floor(value))
+    return value
 end
 
 local function setWalkSpeed(value)
@@ -180,7 +187,8 @@ end)
 
 applyBtn.MouseButton1Click:Connect(function()
     walkSpeedPopup.Visible = false
-    Humanoid.WalkSpeed = tonumber(string.match(valueText.Text, "%d+")) or 16
+    local speed = tonumber(string.match(valueText.Text, "%d+")) or 16
+    Humanoid.WalkSpeed = speed
 end)
 
 local sliding = false
@@ -196,9 +204,113 @@ end)
 
 UIS.InputChanged:Connect(function(input)
     if sliding and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local x = (input.Position.X - slider.AbsolutePosition.X) / slider.AbsoluteSize.X
+        local x = (input.Position.X - sliderTrack.AbsolutePosition.X) / sliderTrack.AbsoluteSize.X
         local value = math.floor(x * 100)
         updateSlider(value)
+    end
+end)
+
+-- Popup de seleção de jogadores
+local teleportPopup = Instance.new("Frame", gui)
+teleportPopup.Size = UDim2.new(0, 250, 0, 300)
+teleportPopup.Position = UDim2.new(0.5, 0, 0.5, 0)
+teleportPopup.AnchorPoint = Vector2.new(0.5, 0.5)
+teleportPopup.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+teleportPopup.BorderSizePixel = 0
+teleportPopup.Visible = false
+teleportPopup.ZIndex = 2
+Instance.new("UICorner", teleportPopup).CornerRadius = UDim.new(0, 12)
+
+local teleportTitle = Instance.new("TextLabel", teleportPopup)
+teleportTitle.Size = UDim2.new(1, 0, 0, 40)
+teleportTitle.Text = "🧝 Teleportar para Jogador"
+teleportTitle.TextColor3 = Color3.new(1, 1, 1)
+teleportTitle.Font = Enum.Font.GothamBold
+teleportTitle.TextSize = 20
+teleportTitle.BackgroundTransparency = 1
+
+local teleportCloseBtn = Instance.new("TextButton", teleportPopup)
+teleportCloseBtn.Size = UDim2.new(0, 30, 0, 30)
+teleportCloseBtn.Position = UDim2.new(1, -35, 0, 5)
+teleportCloseBtn.Text = "X"
+teleportCloseBtn.Font = Enum.Font.GothamBold
+teleportCloseBtn.TextSize = 18
+teleportCloseBtn.TextColor3 = Color3.new(1, 1, 1)
+teleportCloseBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+teleportCloseBtn.ZIndex = 3
+Instance.new("UICorner", teleportCloseBtn).CornerRadius = UDim.new(0, 6)
+
+local playersList = Instance.new("ScrollingFrame", teleportPopup)
+playersList.Size = UDim2.new(1, -20, 1, -100)
+playersList.Position = UDim2.new(0, 10, 0, 50)
+playersList.BackgroundTransparency = 1
+playersList.BorderSizePixel = 0
+playersList.ScrollBarThickness = 5
+playersList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+local layout = Instance.new("UIListLayout", playersList)
+layout.Padding = UDim.new(0, 5)
+
+local teleportBtn = Instance.new("TextButton", teleportPopup)
+teleportBtn.Size = UDim2.new(0.6, 0, 0, 40)
+teleportBtn.Position = UDim2.new(0.2, 0, 1, -50)
+teleportBtn.Text = "Teleportar"
+teleportBtn.Font = Enum.Font.GothamBold
+teleportBtn.TextSize = 18
+teleportBtn.TextColor3 = Color3.new(1, 1, 1)
+teleportBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 127)
+teleportBtn.Visible = false
+Instance.new("UICorner", teleportBtn).CornerRadius = UDim.new(0, 6)
+
+local selectedPlayer = nil
+
+local function updatePlayersList()
+    for _, child in ipairs(playersList:GetChildren()) do
+        if child:IsA("TextButton") then
+            child:Destroy()
+        end
+    end
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LP then
+            local playerBtn = Instance.new("TextButton", playersList)
+            playerBtn.Size = UDim2.new(1, 0, 0, 40)
+            playerBtn.Text = player.Name
+            playerBtn.Font = Enum.Font.Gotham
+            playerBtn.TextSize = 16
+            playerBtn.TextColor3 = Color3.new(1, 1, 1)
+            playerBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            playerBtn.AutoButtonColor = true
+            Instance.new("UICorner", playerBtn).CornerRadius = UDim.new(0, 6)
+            
+            playerBtn.MouseButton1Click:Connect(function()
+                selectedPlayer = player
+                teleportBtn.Visible = true
+                for _, btn in ipairs(playersList:GetChildren()) do
+                    if btn:IsA("TextButton") then
+                        btn.BackgroundColor3 = btn == playerBtn and Color3.fromRGB(0, 120, 200) or Color3.fromRGB(60, 60, 60)
+                    end
+                end
+            end)
+        end
+    end
+end
+
+local function showTeleportPopup()
+    teleportPopup.Visible = true
+    updatePlayersList()
+    selectedPlayer = nil
+    teleportBtn.Visible = false
+end
+
+teleportCloseBtn.MouseButton1Click:Connect(function()
+    teleportPopup.Visible = false
+end)
+
+teleportBtn.MouseButton1Click:Connect(function()
+    if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        HRP.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+        teleportPopup.Visible = false
     end
 end)
 
@@ -306,13 +418,7 @@ local function createBtn(text, callback)
     btn.MouseButton1Click:Connect(callback)
 end
 
-createBtn("🧝 Teleportar para Jogador", function()
-    local name = game:GetService("StarterGui"):PromptInput("Nome do jogador:")
-    local p = Players:FindFirstChild(name)
-    if p and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-        HRP.CFrame = p.Character.HumanoidRootPart.CFrame + Vector3.new(0, 5, 0)
-    end
-end)
+createBtn("🧝 Teleportar para Jogador", showTeleportPopup)
 
 createBtn("🌀 Fling Jogador", function()
     local name = game:GetService("StarterGui"):PromptInput("Nome do jogador para fling:")
@@ -371,3 +477,7 @@ createBtn("❌ Fechar Script", function()
     resetHacks()
     gui:Destroy()
 end)
+
+-- Atualizar lista de jogadores quando alguém entrar/sair
+Players.PlayerAdded:Connect(updatePlayersList)
+Players.PlayerRemoving:Connect(updatePlayersList)
