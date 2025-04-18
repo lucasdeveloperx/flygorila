@@ -92,21 +92,28 @@ local function createToggle(text, stateTableKey, callback)
     end)
 end
 
--- Popup do WalkSpeed
+-- Popup do WalkSpeed com efeito neôn
 local walkSpeedPopup = Instance.new("Frame", gui)
 walkSpeedPopup.Size = UDim2.new(0, 250, 0, 180)
 walkSpeedPopup.Position = UDim2.new(0.5, 0, 0.5, 0)
 walkSpeedPopup.AnchorPoint = Vector2.new(0.5, 0.5)
-walkSpeedPopup.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+walkSpeedPopup.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 walkSpeedPopup.BorderSizePixel = 0
 walkSpeedPopup.Visible = false
 walkSpeedPopup.ZIndex = 2
 Instance.new("UICorner", walkSpeedPopup).CornerRadius = UDim.new(0, 12)
 
+-- Efeito de borda neón
+local neonBorder = Instance.new("UIStroke", walkSpeedPopup)
+neonBorder.Color = Color3.fromRGB(0, 255, 255)
+neonBorder.Thickness = 2
+neonBorder.Transparency = 0.5
+neonBorder.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
 local popupTitle = Instance.new("TextLabel", walkSpeedPopup)
 popupTitle.Size = UDim2.new(1, 0, 0, 40)
 popupTitle.Text = "🏃 WalkSpeed"
-popupTitle.TextColor3 = Color3.new(1, 1, 1)
+popupTitle.TextColor3 = Color3.fromRGB(0, 255, 255)
 popupTitle.Font = Enum.Font.GothamBold
 popupTitle.TextSize = 20
 popupTitle.BackgroundTransparency = 1
@@ -122,18 +129,26 @@ closeBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 closeBtn.ZIndex = 3
 Instance.new("UICorner", closeBtn).CornerRadius = UDim.new(0, 6)
 
+-- Track do slider com efeito neón
 local sliderTrack = Instance.new("Frame", walkSpeedPopup)
 sliderTrack.Size = UDim2.new(0.8, 0, 0, 10)
 sliderTrack.Position = UDim2.new(0.1, 0, 0.4, 0)
-sliderTrack.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+sliderTrack.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+sliderTrack.BorderSizePixel = 0
 Instance.new("UICorner", sliderTrack).CornerRadius = UDim.new(1, 0)
 
+local sliderTrackNeon = Instance.new("UIStroke", sliderTrack)
+sliderTrackNeon.Color = Color3.fromRGB(0, 200, 200)
+sliderTrackNeon.Thickness = 2
+
+-- Fill do slider com efeito de gradiente
 local sliderFill = Instance.new("Frame", sliderTrack)
 sliderFill.Size = UDim2.new(0.5, 0, 1, 0)
 sliderFill.BackgroundColor3 = Color3.fromRGB(0, 170, 127)
 sliderFill.BorderSizePixel = 0
 Instance.new("UICorner", sliderFill).CornerRadius = UDim.new(1, 0)
 
+-- Botão do slider com efeito neón
 local sliderBtn = Instance.new("TextButton", sliderTrack)
 sliderBtn.Size = UDim2.new(0, 20, 0, 20)
 sliderBtn.Position = UDim2.new(0.5, -10, 0.5, -10)
@@ -142,11 +157,15 @@ sliderBtn.Text = ""
 sliderBtn.ZIndex = 2
 Instance.new("UICorner", sliderBtn).CornerRadius = UDim.new(1, 0)
 
+local sliderBtnNeon = Instance.new("UIStroke", sliderBtn)
+sliderBtnNeon.Color = Color3.fromRGB(0, 255, 255)
+sliderBtnNeon.Thickness = 2
+
 local valueText = Instance.new("TextLabel", walkSpeedPopup)
 valueText.Size = UDim2.new(1, 0, 0, 30)
 valueText.Position = UDim2.new(0, 0, 0.6, 0)
 valueText.Text = "Velocidade: "..tostring(Humanoid.WalkSpeed)
-valueText.TextColor3 = Color3.new(1, 1, 1)
+valueText.TextColor3 = Color3.fromRGB(0, 255, 255)
 valueText.Font = Enum.Font.Gotham
 valueText.TextSize = 18
 valueText.BackgroundTransparency = 1
@@ -160,6 +179,11 @@ applyBtn.TextSize = 18
 applyBtn.TextColor3 = Color3.new(1, 1, 1)
 applyBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 127)
 Instance.new("UICorner", applyBtn).CornerRadius = UDim.new(0, 6)
+
+-- Efeito neón para o botão aplicar
+local applyBtnNeon = Instance.new("UIStroke", applyBtn)
+applyBtnNeon.Color = Color3.fromRGB(0, 255, 255)
+applyBtnNeon.Thickness = 2
 
 -- Funções do slider WalkSpeed
 local function updateSlider(value)
@@ -210,21 +234,27 @@ UIS.InputChanged:Connect(function(input)
     end
 end)
 
--- Popup de seleção de jogadores
+-- Popup de seleção de jogadores com efeito neón
 local teleportPopup = Instance.new("Frame", gui)
 teleportPopup.Size = UDim2.new(0, 250, 0, 300)
 teleportPopup.Position = UDim2.new(0.5, 0, 0.5, 0)
 teleportPopup.AnchorPoint = Vector2.new(0.5, 0.5)
-teleportPopup.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+teleportPopup.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 teleportPopup.BorderSizePixel = 0
 teleportPopup.Visible = false
 teleportPopup.ZIndex = 2
 Instance.new("UICorner", teleportPopup).CornerRadius = UDim.new(0, 12)
 
+-- Efeito de borda neón
+local teleportNeonBorder = Instance.new("UIStroke", teleportPopup)
+teleportNeonBorder.Color = Color3.fromRGB(255, 0, 255)
+teleportNeonBorder.Thickness = 2
+teleportNeonBorder.Transparency = 0.5
+
 local teleportTitle = Instance.new("TextLabel", teleportPopup)
 teleportTitle.Size = UDim2.new(1, 0, 0, 40)
 teleportTitle.Text = "🧝 Teleportar para Jogador"
-teleportTitle.TextColor3 = Color3.new(1, 1, 1)
+teleportTitle.TextColor3 = Color3.fromRGB(255, 0, 255)
 teleportTitle.Font = Enum.Font.GothamBold
 teleportTitle.TextSize = 20
 teleportTitle.BackgroundTransparency = 1
@@ -258,9 +288,14 @@ teleportBtn.Text = "Teleportar"
 teleportBtn.Font = Enum.Font.GothamBold
 teleportBtn.TextSize = 18
 teleportBtn.TextColor3 = Color3.new(1, 1, 1)
-teleportBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 127)
+teleportBtn.BackgroundColor3 = Color3.fromRGB(170, 0, 170)
 teleportBtn.Visible = false
 Instance.new("UICorner", teleportBtn).CornerRadius = UDim.new(0, 6)
+
+-- Efeito neón para o botão de teleportar
+local teleportBtnNeon = Instance.new("UIStroke", teleportBtn)
+teleportBtnNeon.Color = Color3.fromRGB(255, 0, 255)
+teleportBtnNeon.Thickness = 2
 
 local selectedPlayer = nil
 
@@ -283,12 +318,29 @@ local function updatePlayersList()
             playerBtn.AutoButtonColor = true
             Instance.new("UICorner", playerBtn).CornerRadius = UDim.new(0, 6)
             
+            -- Efeito hover nos botões
+            playerBtn.MouseEnter:Connect(function()
+                if playerBtn ~= selectedPlayer then
+                    TS:Create(playerBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(80, 80, 80)}):Play()
+                end
+            end)
+            
+            playerBtn.MouseLeave:Connect(function()
+                if playerBtn ~= selectedPlayer then
+                    TS:Create(playerBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
+                end
+            end)
+            
             playerBtn.MouseButton1Click:Connect(function()
                 selectedPlayer = player
                 teleportBtn.Visible = true
                 for _, btn in ipairs(playersList:GetChildren()) do
                     if btn:IsA("TextButton") then
-                        btn.BackgroundColor3 = btn == playerBtn and Color3.fromRGB(0, 120, 200) or Color3.fromRGB(60, 60, 60)
+                        if btn == playerBtn then
+                            TS:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(120, 0, 200)}):Play()
+                        else
+                            TS:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
+                        end
                     end
                 end
             end)
